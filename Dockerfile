@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER "joel.roxell@na-kd.com"
+MAINTAINER "Joel Roxell <joel.roxell@na-kd.com>"
 
 ARG SERVICE_NAME
 ARG BOOTSTRAP
