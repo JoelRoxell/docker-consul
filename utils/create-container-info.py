@@ -101,13 +101,14 @@ def create_server_skeleton(
 
         skeleton = json.dumps(
             {
-                "bootstrap": bootstrap in ['true', 'True', '1'],
+                "bootstrap": False,
                 "server": server in ['true', 'True', '1'],
                 "datacenter": datacenter,
                 "node_name": NODE_NAME,
                 "data_dir": "/var/consul",
                 "encrypt": encrypt,
-                "start_join": joins
+                "start_join": joins,
+                "leave_on_terminate": True
             }, separators=(',', ':')
         )
 

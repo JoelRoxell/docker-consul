@@ -44,6 +44,5 @@ WORKDIR /opt/nakd-consul/
 
 COPY utils ./utils
 COPY start.sh .
-COPY on-exit.sh .
 
 ENTRYPOINT ["bash", "start.sh"]
