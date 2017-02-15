@@ -4,6 +4,28 @@ Image that allows containers which registers to host ports dynamically to regist
 ## Usage
 > make sure to start the consul agent within your entrypint: `/opt/nakd-consul/start.sh &`
 
+*To leave closur cluster on exit follow this example:*
+```bash
+#!/bin/bash
+
+# Catch termination signals
+trap 'kill -TERM $PID; wait $PID' SIGINT SIGTERM
+
+# Start consul agent
+/opt/nakd-consul/start.sh &
+
+# Start application
+node /opt/src/index.js &
+
+# Wait for sub-process to finish.
+PID=$!
+wait $PID
+
+# Leave consule cluster before termination.
+consul leave
+```
+
+
 ### Create bootstrap server container
 ```bash
 docker run -p host:container -d \
