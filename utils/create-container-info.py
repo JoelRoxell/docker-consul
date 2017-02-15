@@ -101,7 +101,7 @@ def create_server_skeleton(
 
         skeleton = json.dumps(
             {
-                "bootstrap": bootstrap in ['true', 'True', '1'],
+                "bootstrap": False,
                 "server": server in ['true', 'True', '1'],
                 "datacenter": datacenter,
                 "node_name": NODE_NAME,
