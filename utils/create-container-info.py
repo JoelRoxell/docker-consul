@@ -107,8 +107,7 @@ def create_server_skeleton(
                 "node_name": NODE_NAME,
                 "data_dir": "/var/consul",
                 "encrypt": encrypt,
-                "start_join": joins,
-                "leave_on_terminate": True
+                "start_join": joins
             }, separators=(',', ':')
         )
 

@@ -2,7 +2,7 @@
 Image that allows containers which registers to host ports dynamically to register agains consul servers with valid client/server configurations.
 
 ## Usage
-> make sure to start the consul agent: ENTRYPOINT ["bash", "/opt/nakd-consul/start.sh"]
+> make sure to start the consul agent within your entrypint: `/opt/nakd-consul/start.sh &`
 
 ### Create bootstrap server container
 ```bash
