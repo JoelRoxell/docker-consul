@@ -1,14 +1,14 @@
 # docker-consul (WIP)
-Image that allows containers which registers to host ports dynamically to register agains consul servers with valid client/server configurations.
+Image which registers containers with dynamic port allocation to a consul clusters on start.
 
 ## Usage
 > make sure to start the consul agent within your entrypint: `/opt/nakd-consul/start.sh &`
 
-*To leave closur cluster on exit follow this example:*
+*To leave consul cluster on exit follow this example:*
 ```bash
 #!/bin/bash
 
-# Catch termination signals
+# Catch termination signal
 trap 'kill -TERM $PID; wait $PID' SIGINT SIGTERM
 
 # Start consul agent
@@ -26,7 +26,7 @@ consul leave
 ```
 
 
-### Create bootstrap server container
+### Create bootstrap agent
 ```bash
 docker run -p host:container -d \
 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -36,7 +36,7 @@ docker run -p host:container -d \
 joelroxell/docker-consul
 ```
 
-### Create server container
+### Create server agent
 ```bash
 docker run -p host:container -d \
 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -46,7 +46,7 @@ docker run -p host:container -d \
 joelroxell/docker-consul
 ```
 
-### Create client container
+### Create client agent
 ```bash
 docker run -p host:container -d \
 -v /var/run/docker.sock:/var/run/docker.sock \
