@@ -9,6 +9,8 @@ ARG DATACENTER
 ARG NODE_NAME
 ARG ENCRYPT
 ARG START_JOIN
+ARG BOOTSTRAP_EXPECT
+ARG UI
 
 # Install required packages and updates
 RUN apt-get update

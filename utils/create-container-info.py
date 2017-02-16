@@ -14,6 +14,8 @@ DATACENTER = os.getenv('DATACENTER', 'default')
 NODE_NAME = os.getenv('NODE_NAME', HOSTNAME)
 ENCRYPT = os.environ['ENCRYPT'] # will throw exception if non-existent.
 START_JOIN = os.getenv('START_JOIN', '')
+BOOTSTRAP_EXPECT = os.getenv('BOOTSTRAP_EXPECT', 3)
+UI = os.getenv('UI', False)
 
 def get_port_configuration():
     """Gather port assignments for container"""
@@ -93,7 +95,8 @@ def create_server_skeleton(
             "node_name": NODE_NAME,
             "data_dir": "/var/consul",
             "encrypt": encrypt,
-            "log_level": "INFO"
+            "log_level": "INFO",
+            "ui": UI in ['true']
         })
     else:
         if len(start_join) > 1:
@@ -107,7 +110,9 @@ def create_server_skeleton(
                 "node_name": NODE_NAME,
                 "data_dir": "/var/consul",
                 "encrypt": encrypt,
-                "start_join": joins
+                "start_join": joins,
+                "ui": UI in ['true'],
+                "bootstrap_expect": int(BOOTSTRAP_EXPECT)
             }, separators=(',', ':')
         )
 
