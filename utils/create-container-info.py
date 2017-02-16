@@ -68,6 +68,9 @@ def create_service_file():
     if not len(ports) > 0:
         return
 
+    if not len(SERVICE_NAME) > 0:
+        return
+
     # Write service file
     service_file = open('/consul/config/service.json', 'w+')
     service_file.write(generate_service_json(SERVICE_NAME, ports[0]))
@@ -88,6 +91,7 @@ def create_server_skeleton(
     skeleton = {}
 
     if bootstrap == 'true':
+        # create bootstrap
         skeleton = json.dumps({
             "bootstrap": bootstrap in ['true', 'True', '1'],
             "server": server in ['true', 'True', '1'],
@@ -98,7 +102,8 @@ def create_server_skeleton(
             "log_level": "INFO",
             "ui": UI in ['true']
         })
-    else:
+    else if bootstrap == 'false' and server =='true' :
+        # create server
         if len(start_join) > 1:
             joins = start_join.split(',')
 
@@ -113,6 +118,23 @@ def create_server_skeleton(
                 "start_join": joins,
                 "ui": UI in ['true'],
                 "bootstrap_expect": int(BOOTSTRAP_EXPECT)
+            }, separators=(',', ':')
+        )
+    else
+        # create client
+        if len(start_join) > 1:
+            joins = start_join.split(',')
+
+        skeleton = json.dumps(
+            {
+                "bootstrap": False,
+                "server": server in ['true', 'True', '1'],
+                "datacenter": datacenter,
+                "node_name": NODE_NAME,
+                "data_dir": "/var/consul",
+                "encrypt": encrypt,
+                "start_join": joins,
+                "ui": UI in ['true']
             }, separators=(',', ':')
         )
 
