@@ -148,14 +148,20 @@ function onStart(containerId) {
   collectContainerInfo(containerId, data => {
     environment = collectEnvVariables(data.env);
 
-    const {
+    let {
       SERVICE_NAME,
       TAGS
     } = environment;
 
-    keys = Object.keys(data.ports);
+    TAGS = TAGS || '';
+    let port = null;
 
-    let port = data.ports[keys[0]][0];
+    if (data.ports) {
+      keys = Object.keys(data.ports);
+
+      port = data.ports[keys[0]][0];
+    }
+
 
     if(port.hasOwnProperty('HostPort'))
       port = port.HostPort;
@@ -183,6 +189,10 @@ function onStart(containerId) {
 // Deregister consul service on container termination.
 function onExit(containerId) {
   service = registerdServices.find(service => service.containerId == containerId);
+
+  if (!service) {
+    return;
+  }
 
   fs.unlink(path.join(CONSULE_CONFIG_LOCATION, service.fileName + '.json'), function() {
     registerdServices.splice(registerdServices.indexOf(service), 1);
