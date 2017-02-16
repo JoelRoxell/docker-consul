@@ -25,7 +25,6 @@ wait $PID
 consul leave
 ```
 
-
 ### Create bootstrap agent
 ```bash
 docker run -p host:container -d \

@@ -16,6 +16,7 @@ RUN apt-get install unzip -y
 RUN apt-get install curl -y
 RUN apt-get install -y net-tools
 RUN apt-get install -y vim
+RUN apt-get install build-essential python -y
 
 # Install docker
 RUN apt-get -y --no-install-recommends install \
@@ -43,6 +44,6 @@ RUN mkdir -p /opt/nakd-consul/
 WORKDIR /opt/nakd-consul/
 
 COPY utils ./utils
-COPY start.sh .
+COPY start.sh start.sh
 
 ENTRYPOINT ["bash", "start.sh"]
