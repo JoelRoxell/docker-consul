@@ -25,11 +25,11 @@ dockerEvents.stdout.on('data', (data) => {
 
   const [timeStamp, type, action, containerId] = payload;
 
-  if(!timeStamp.length) {
+  if(!timeStamp.length || !containerId) {
     return;
   }
 
-  console.log(`[INFO] ${timeStamp}:`, type, action, containerId);
+  console.log(`[INFO] ${timeStamp}:`, type, action, containerId.substring(0, 12));
 
   if(type != 'container') {
     return;
@@ -51,7 +51,7 @@ dockerEvents.stderr.on('data', (data) => {
 });
 
 dockerEvents.on('close', (code) => {
-  console.log(`child process exited with code ${code}`);
+  console.log(`[INFO] ${new Date().toISOString()}: child process exited with code ${code}`);
 });
 
 function collectContainerInfo(containerId, cb) {
@@ -86,21 +86,8 @@ function collectContainerInfo(containerId, cb) {
   });
 
   inspect.on('close', code => {
-    console.log('exit inspect');
+    console.log(`[INFO] ${new Date().toISOString()}: finished container inspection`);
   });
-}
-
-function createClient(datacenter = 'default', nodeName, encrypt, joins = [], ui = false) {
-  return {
-    "bootstrap": false,
-    "server": false,
-    "datacenter": datacenter,
-    "node_name": nodeName,
-    "data_dir": "/var/consul",
-    "encrypt": encrypt,
-    "start_join": joins,
-    "ui": ui == 'true'
-  }
 }
 
 function createService(name, tags = [], port) {
@@ -111,24 +98,6 @@ function createService(name, tags = [], port) {
       port
     }
   }
-}
-
-function createAgentFile(bootstrap = false, server = false, encrypt, joins = [], ui = false) {
-  const {
-    DATACENTER,
-    ENCRYPT,
-    BOOTSTRAP,
-    SERVER,
-    BOOTSTRAP_EXPECT,
-    HOSTNAME,
-    START_JOIN
-  } = process.env;
-
-  let agent;
-
-  agent = createClient(DATACENTER, HOSTNAME, ENCRYPT, START_JOIN.split(','));
-
-  return agent;
 }
 
 function collectEnvVariables(envs) {
@@ -153,32 +122,46 @@ function onStart(containerId) {
       TAGS
     } = environment;
 
+    if (!SERVICE_NAME) {
+      return;
+    }
+
     TAGS = TAGS || '';
-    let port = null;
+
+    let port = {};
 
     if (data.ports) {
       keys = Object.keys(data.ports);
 
-      port = data.ports[keys[0]][0];
+      if(keys.length > 0) {
+        port = data.ports[keys[0]][0];
+      }
     }
 
 
     if(port.hasOwnProperty('HostPort'))
       port = port.HostPort;
 
-    let agent = createService(SERVICE_NAME, TAGS.split(','), port);
+    if(isNaN(port)) {
+      return;
+    }
 
-    fs.writeFile(path.join(CONSULE_CONFIG_LOCATION, `${SERVICE_NAME}.json`), JSON.stringify(agent), (err) => {
+    let agent = createService(SERVICE_NAME, TAGS.split(','), parseInt(port));
+
+
+    const fileName = Math.random().toString(36).substring(7);
+
+    console.log(`[INFO] ${new Date().toISOString()}: writing ${fileName}.json`);
+    fs.writeFile(path.join(CONSULE_CONFIG_LOCATION, `${fileName}.json`), JSON.stringify(agent), (err) => {
       if(err) {
-        console.log(err);
-        return;
+        return console.log(err);
       }
 
-      console.log(`[INFO]: ${SERVICE_NAME}.json`);
+      console.log(`[INFO] ${new Date().toISOString()}: write completed.`);
 
       registerdServices.push({
         containerId,
-        fileName: SERVICE_NAME
+        fileName
       });
 
       reloadConsul();
@@ -196,9 +179,7 @@ function onExit(containerId) {
 
   fs.unlink(path.join(CONSULE_CONFIG_LOCATION, service.fileName + '.json'), function() {
     registerdServices.splice(registerdServices.indexOf(service), 1);
-
-    console.log(registerdServices);
-
+    console.log(`[INFO] ${new Date().toISOString()}: removed ${service.fileName}.json`);
     reloadConsul();
   });
 }
@@ -208,14 +189,14 @@ function reloadConsul() {
   consulReload = spawn('consul', ['reload']);
 
   consulReload.stdout.on('data', data => {
-    console.log(data);
+    console.log(data.toString());
   });
 
   consulReload.stderr.on('data', data => {
-    console.log(data);
+    console.log(data.toString());
   });
 
   consulReload.on('close', code => {
-    console.log(code);
+    // console.log(code);
   });
 }
