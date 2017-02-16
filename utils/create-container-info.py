@@ -102,7 +102,7 @@ def create_server_skeleton(
             "log_level": "INFO",
             "ui": UI in ['true']
         })
-    else if bootstrap == 'false' and server =='true' :
+    elif bootstrap == 'false' and server =='true' :
         # create server
         if len(start_join) > 1:
             joins = start_join.split(',')
@@ -120,7 +120,7 @@ def create_server_skeleton(
                 "bootstrap_expect": int(BOOTSTRAP_EXPECT)
             }, separators=(',', ':')
         )
-    else
+    else:
         # create client
         if len(start_join) > 1:
             joins = start_join.split(',')
