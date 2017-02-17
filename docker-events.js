@@ -186,7 +186,7 @@ function onExit(containerId) {
 
 // Reload consul configuration.
 function reloadConsul() {
-  consulReload = spawn('consul', ['reload']);
+  consulReload = spawn('consul', ['reload', `-rpc-addr=${process.env.HOST_IP}:8400`]);
 
   consulReload.stdout.on('data', data => {
     console.log(data.toString());
